@@ -34,7 +34,13 @@ A view mixin which verifies that the user has not authenticated.
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated():
             template_name = settings.TEMPLATE_403_PAGE
-            return permission_denied(request, template_name=template_name)
+            try:
+                # Up to Django 1.8
+                return permission_denied(request, template_name=template_name)
+            except TypeError:
+                # Django 1.9 and higher
+                return permission_denied(request, None, template_name=template_name)
+
         return super(LoggedOutMixin, self).dispatch(request, *args, **kwargs)
 
 
